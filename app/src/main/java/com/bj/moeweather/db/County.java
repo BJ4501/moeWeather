@@ -6,7 +6,7 @@ import org.litepal.crud.DataSupport;
  * 县、区实体类
  * Created by BJ on 2018/1/28.
  */
-public class Country extends DataSupport {
+public class County extends DataSupport {
 
     private int id;
 

@@ -7,7 +7,7 @@
     <list>
         <mapping class="com.bj.moeweather.db.Province" />
         <mapping class="com.bj.moeweather.db.City" />
-        <mapping class="com.bj.moeweather.db.Country" />
+        <mapping class="com.bj.moeweather.db.County" />
     </list>
 
 </litepal>
