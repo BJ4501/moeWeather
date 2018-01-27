@@ -25,3 +25,11 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+ext{
+    //版本号管理
+    butterknifeVersion = '8.5.1'
+
+    gsonVersion = '2.8.0'
+    retrofitVersion = '2.1.0'
+}
