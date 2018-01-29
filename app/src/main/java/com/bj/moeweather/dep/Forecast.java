@@ -1,4 +1,4 @@
-package com.bj.moeweather.gson;
+package com.bj.moeweather.dep;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -6,6 +6,7 @@ import com.google.gson.annotations.SerializedName;
  * JSON中未来几天的天气信息
  * Created by BJ on 2018/1/28.
  */
+@Deprecated
 public class Forecast {
 
     public String date;

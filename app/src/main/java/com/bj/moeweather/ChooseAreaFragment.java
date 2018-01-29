@@ -109,6 +109,13 @@ public class ChooseAreaFragment extends Fragment {
                     intent.putExtra("weather_id",weatherId);
                     startActivity(intent);
                     getActivity().finish();
+
+                    //GPS页
+                    /*String weatherId = countyList.get(position).getWeatherId();
+                    Intent intent = new Intent(getActivity(),LocalGpsActivity.class);
+                    intent.putExtra("weather_id",weatherId);
+                    startActivity(intent);
+                    getActivity().finish();*/
                 }
             }
         });

@@ -1,4 +1,4 @@
-package com.bj.moeweather.gson;
+package com.bj.moeweather.dep;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -6,6 +6,7 @@ import com.google.gson.annotations.SerializedName;
  * JSON中的出行建议
  * Created by BJ on 2018/1/28.
  */
+@Deprecated
 public class Suggestion {
 
     @SerializedName("comf")
