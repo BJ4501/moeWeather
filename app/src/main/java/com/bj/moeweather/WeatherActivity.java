@@ -7,6 +7,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -59,6 +60,10 @@ public class WeatherActivity extends Activity {
     TextView sportText;
     @BindView(R.id.bing_pic_img)
     ImageView bingPicImg;
+    @BindView(R.id.swipe_refresh)
+    SwipeRefreshLayout swipeRefresh;
+
+    private String mWeatherId;
 
 
     @Override
@@ -75,7 +80,9 @@ public class WeatherActivity extends Activity {
         setContentView(R.layout.activity_weather);
         //初始化ButterKnife
         ButterKnife.bind(this);
-        //fixme 缓存
+        //下拉刷新
+        swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
+        //缓存
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherString = prefs.getString("weather",null);
         if (weatherString != null){
@@ -84,13 +91,22 @@ public class WeatherActivity extends Activity {
             AirNow airNow = Utility.handleAirNowResponse(prefs.getString("airNow",null));
             WeatherForecast weatherForecast = Utility.handleWeatherForecastResponse(prefs.getString("weatherForecast",null));
             WeatherLifestyle weatherLifestyle = Utility.handleWeatherLifestyleResponse(prefs.getString("weatherLifestyle",null));
+            //获得WeatherId
+            mWeatherId = weatherNow.basic.cid;
             showWeatherInfo(weatherNow,airNow,weatherForecast,weatherLifestyle);
         }else {
             //无缓存时去服务器查询天气
-            String weatherId = getIntent().getStringExtra("weather_id");
+            mWeatherId = getIntent().getStringExtra("weather_id");
             weatherLayout.setVisibility(View.INVISIBLE);
-            requestWeather(weatherId);
+            requestWeather(mWeatherId);
         }
+
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                requestWeather(mWeatherId);
+            }
+        });
 
         //加载背景图片
         String bingPic = prefs.getString("bing_pic",null);
@@ -134,15 +150,17 @@ public class WeatherActivity extends Activity {
             @Override
             public void run() {
                 if (weatherNow != null && "ok".equals(weatherNow.status)
-                        &&airNow != null && "ok".equals(airNow.status)
+                        //&&airNow != null && "ok".equals(airNow.status)
                         &&weatherForecast != null && "ok".equals(weatherForecast.status)
                         &&weatherLifestyle != null && "ok".equals(weatherLifestyle.status)){
 
+                    mWeatherId = weatherNow.basic.cid;
                     //显示
                     showWeatherInfo(weatherNow,airNow,weatherForecast,weatherLifestyle);
                 } else {
                     Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
                 }
+                swipeRefresh.setRefreshing(false);
             }
         });
         //显示背景图片
@@ -158,6 +176,7 @@ public class WeatherActivity extends Activity {
                     @Override
                     public void run() {
                         Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                        swipeRefresh.setRefreshing(false);
                     }
                 });
             }
@@ -176,7 +195,7 @@ public class WeatherActivity extends Activity {
     //处理并展示Weather实体类中的数据
     private void showWeatherInfo(WeatherNow weatherNow, AirNow airNow, WeatherForecast weatherForecast, WeatherLifestyle weatherLifestyle) {
         if (weatherNow != null && "ok".equals(weatherNow.status)
-                &&airNow != null && "ok".equals(airNow.status)
+                //&&airNow != null && "ok".equals(airNow.status)
                 &&weatherForecast != null && "ok".equals(weatherForecast.status)
                 &&weatherLifestyle != null && "ok".equals(weatherLifestyle.status)){
 
@@ -204,14 +223,13 @@ public class WeatherActivity extends Activity {
             }
             //TODO 如果查不到，可以查询市区名的气象状态
 
-            if (airNow.airNowCity.aqi != null)
+            if (airNow.airNowCity != null){
                 aqiText.setText(airNow.airNowCity.aqi);
-            else
-                aqiText.setText("未知");
-            if (airNow.airNowCity.pm25 != null)
                 pm25Text.setText(airNow.airNowCity.pm25);
-            else
+            }else {
+                aqiText.setText("未知");
                 pm25Text.setText("未知");
+            }
 
             String comfort = "舒适度：" + weatherLifestyle.lifestyleList.get(1);
             String carWash = "洗车指数：" + weatherLifestyle.lifestyleList.get(2);
