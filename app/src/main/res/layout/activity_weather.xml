@@ -7,6 +7,12 @@
     android:background="@color/colorPrimary"
     tools:context="com.bj.moeweather.WeatherActivity">
     <!--天气页面-->
+    <!--背景图片-->
+    <ImageView
+        android:id="@+id/bing_pic_img"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"/>
     <!--滚动布局-->
     <ScrollView
         android:id="@+id/weather_layout"
@@ -19,7 +25,9 @@
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:fitsSystemWindows="true">
+            <!--android:fitsSystemWindows="true" 为系统状态栏留出空间-->
 
             <include layout="@layout/title"/>
             <include layout="@layout/now"/>

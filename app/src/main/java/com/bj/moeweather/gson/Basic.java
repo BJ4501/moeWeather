@@ -19,7 +19,7 @@ public class Basic {
 
     public class Update{
         @SerializedName("loc")
-        public String updateName; //天气的更新时间
+        public String updateTime; //天气的更新时间
     }
 
 }
