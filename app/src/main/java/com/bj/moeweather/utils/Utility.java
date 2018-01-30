@@ -95,11 +95,13 @@ public class Utility {
      */
     public static WeatherNow handleWeatherNowResponse(String response){
         try {
-            JSONObject jsonObject = new JSONObject(response);
-            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather6");
-            String weatherContent = jsonArray.getJSONObject(0).toString();
-            //将获得的Json转换为Weather
-            return new Gson().fromJson(weatherContent,WeatherNow.class);
+            if (response != null) {
+                JSONObject jsonObject = new JSONObject(response);
+                JSONArray jsonArray = jsonObject.getJSONArray("HeWeather6");
+                String weatherContent = jsonArray.getJSONObject(0).toString();
+                //将获得的Json转换为Weather
+                return new Gson().fromJson(weatherContent, WeatherNow.class);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -111,11 +113,13 @@ public class Utility {
      */
     public static WeatherLifestyle handleWeatherLifestyleResponse(String response){
         try {
-            JSONObject jsonObject = new JSONObject(response);
-            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather6");
-            String weatherContent = jsonArray.getJSONObject(0).toString();
-            //将获得的Json转换为Weather
-            return new Gson().fromJson(weatherContent,WeatherLifestyle.class);
+            if (response != null) {
+                JSONObject jsonObject = new JSONObject(response);
+                JSONArray jsonArray = jsonObject.getJSONArray("HeWeather6");
+                String weatherContent = jsonArray.getJSONObject(0).toString();
+                //将获得的Json转换为Weather
+                return new Gson().fromJson(weatherContent, WeatherLifestyle.class);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -127,11 +131,13 @@ public class Utility {
      */
     public static WeatherForecast handleWeatherForecastResponse(String response){
         try {
-            JSONObject jsonObject = new JSONObject(response);
-            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather6");
-            String weatherContent = jsonArray.getJSONObject(0).toString();
-            //将获得的Json转换为Weather
-            return new Gson().fromJson(weatherContent,WeatherForecast.class);
+            if (response != null) {
+                JSONObject jsonObject = new JSONObject(response);
+                JSONArray jsonArray = jsonObject.getJSONArray("HeWeather6");
+                String weatherContent = jsonArray.getJSONObject(0).toString();
+                //将获得的Json转换为Weather
+                return new Gson().fromJson(weatherContent,WeatherForecast.class);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -144,11 +150,13 @@ public class Utility {
      */
     public static AirNow handleAirNowResponse(String response){
         try {
-            JSONObject jsonObject = new JSONObject(response);
-            JSONArray jsonArray = jsonObject.getJSONArray("HeWeather6");
-            String weatherContent = jsonArray.getJSONObject(0).toString();
-            //将获得的Json转换为Weather
-            return new Gson().fromJson(weatherContent,AirNow.class);
+            if (response != null) {
+                JSONObject jsonObject = new JSONObject(response);
+                JSONArray jsonArray = jsonObject.getJSONArray("HeWeather6");
+                String weatherContent = jsonArray.getJSONObject(0).toString();
+                //将获得的Json转换为Weather
+                return new Gson().fromJson(weatherContent, AirNow.class);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }

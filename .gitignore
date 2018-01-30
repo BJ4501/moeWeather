@@ -8,3 +8,5 @@
 /build
 /captures
 .externalNativeBuild
+# Pwd Class:
+/app/src/main/java/com/bj/moeweather/common/CommonKey.java

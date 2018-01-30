@@ -1,23 +1,25 @@
 package com.bj.moeweather;
 
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bj.moeweather.dep.Forecast;
-import com.bj.moeweather.dep.Weather;
+import com.bj.moeweather.common.Const;
 import com.bj.moeweather.gson.AirNow;
 import com.bj.moeweather.gson.WeatherForecast;
 import com.bj.moeweather.gson.WeatherLifestyle;
@@ -34,7 +36,7 @@ import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.Response;
 
-public class WeatherActivity extends Activity {
+public class WeatherActivity extends AppCompatActivity {
     @Nullable
     @BindView(R.id.weather_layout)
     ScrollView weatherLayout;
@@ -62,8 +64,13 @@ public class WeatherActivity extends Activity {
     ImageView bingPicImg;
     @BindView(R.id.swipe_refresh)
     SwipeRefreshLayout swipeRefresh;
+    @BindView(R.id.drawer_layout)
+    DrawerLayout drawerLayout;
+    @BindView(R.id.nav_button)
+    Button navButton;
 
     private String mWeatherId;
+
 
 
     @Override
@@ -85,14 +92,15 @@ public class WeatherActivity extends Activity {
         //缓存
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String weatherString = prefs.getString("weather",null);
-        if (weatherString != null){
-            //有缓存时，直接解析天气数据
-            WeatherNow weatherNow = Utility.handleWeatherNowResponse(prefs.getString("weatherNow",null));
+        WeatherNow weatherNow = Utility.handleWeatherNowResponse(prefs.getString("weatherNow",null));
+
+        //有缓存时,直接解析天气数据,检查缓存的数据是否是当前城市的
+        if (weatherString != null && weatherNow != null && weatherNow.basic.cid.equals(getIntent().getStringExtra("weather_id"))){
             AirNow airNow = Utility.handleAirNowResponse(prefs.getString("airNow",null));
             WeatherForecast weatherForecast = Utility.handleWeatherForecastResponse(prefs.getString("weatherForecast",null));
             WeatherLifestyle weatherLifestyle = Utility.handleWeatherLifestyleResponse(prefs.getString("weatherLifestyle",null));
             //获得WeatherId
-            mWeatherId = weatherNow.basic.cid;
+            //mWeatherId = weatherNow.basic.cid;
             showWeatherInfo(weatherNow,airNow,weatherForecast,weatherLifestyle);
         }else {
             //无缓存时去服务器查询天气
@@ -100,6 +108,13 @@ public class WeatherActivity extends Activity {
             weatherLayout.setVisibility(View.INVISIBLE);
             requestWeather(mWeatherId);
         }
+
+        navButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                drawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
 
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -121,23 +136,15 @@ public class WeatherActivity extends Activity {
     //----根据天气id请求城市天气信息------
 
     //获取实况天气
-    private void requestWeather(final String weatherId) {
+    public void requestWeather(final String weatherId) {
         //需要获取四种数据 Now，AirNow，Forecast，LifeStyle
-        String weatherNowUrl = "https://free-api.heweather.com/s6/weather/now?location="
-                + weatherId + "&key=7308de07cfe14045924b52dd7369ba66";
-        requestWeatherPlugin(weatherNowUrl,"weatherNow");
+        requestWeatherPlugin(Const.getWeatherNowUrl(weatherId),"weatherNow");
 
-        String airNowUrl = "https://free-api.heweather.com/s6/air/now?location="
-                + weatherId + "&key=7308de07cfe14045924b52dd7369ba66";
-        requestWeatherPlugin(airNowUrl,"airNow");
+        requestWeatherPlugin(Const.getAirNowUrl(weatherId),"airNow");
 
-        String weatherForecastUrl = "https://free-api.heweather.com/s6/weather/forecast?location="
-                + weatherId + "&key=7308de07cfe14045924b52dd7369ba66";
-        requestWeatherPlugin(weatherForecastUrl,"weatherForecast");
+        requestWeatherPlugin(Const.getWeatherForecastUrl(weatherId),"weatherForecast");
 
-        String weatherLifestyleUrl = "https://free-api.heweather.com/s6/weather/lifestyle?location="
-                + weatherId + "&key=7308de07cfe14045924b52dd7369ba66";
-        requestWeatherPlugin(weatherLifestyleUrl,"weatherLifestyle");
+        requestWeatherPlugin(Const.getWeatherLifestyleUrl(weatherId),"weatherLifestyle");
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -154,11 +161,11 @@ public class WeatherActivity extends Activity {
                         &&weatherForecast != null && "ok".equals(weatherForecast.status)
                         &&weatherLifestyle != null && "ok".equals(weatherLifestyle.status)){
 
-                    mWeatherId = weatherNow.basic.cid;
+                    //mWeatherId = weatherNow.basic.cid;
                     //显示
                     showWeatherInfo(weatherNow,airNow,weatherForecast,weatherLifestyle);
                 } else {
-                    Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(WeatherActivity.this, "获取天气信息失败1", Toast.LENGTH_SHORT).show();
                 }
                 swipeRefresh.setRefreshing(false);
             }
@@ -175,7 +182,7 @@ public class WeatherActivity extends Activity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(WeatherActivity.this, "获取天气信息失败2", Toast.LENGTH_SHORT).show();
                         swipeRefresh.setRefreshing(false);
                     }
                 });
@@ -231,9 +238,9 @@ public class WeatherActivity extends Activity {
                 pm25Text.setText("未知");
             }
 
-            String comfort = "舒适度：" + weatherLifestyle.lifestyleList.get(1);
-            String carWash = "洗车指数：" + weatherLifestyle.lifestyleList.get(2);
-            String sport = "运动建议：" + weatherLifestyle.lifestyleList.get(3);
+            String comfort = "舒适度：" + weatherLifestyle.lifestyleList.get(1).txt;
+            String carWash = "洗车指数：" + weatherLifestyle.lifestyleList.get(2).txt;
+            String sport = "运动建议：" + weatherLifestyle.lifestyleList.get(3).txt;
             comfortText.setText(comfort);
             carWashText.setText(carWash);
             sportText.setText(sport);
@@ -267,36 +274,3 @@ public class WeatherActivity extends Activity {
         });
     }
 }
-
-
-/*HttpUtils.sendOkHttpRequest(weatherLifestyleUrl, new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                final String responseText = response.body().string();
-                //将JSON解析为Weather
-                final WeatherNow weatherNow = Utility.handleWeatherNowResponse(responseText);
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (weatherNow != null && "ok".equals(weatherNow.status)){
-                            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
-                            editor.putString("weatherNow", responseText).apply();
-                            //showWeatherInfo(weatherNow);
-                        } else {
-                            Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
-                        }
-                    }
-                });
-            }
-        });*/
-
