@@ -1,5 +1,6 @@
 package com.bj.moeweather;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
@@ -24,6 +25,7 @@ import com.bj.moeweather.gson.AirNow;
 import com.bj.moeweather.gson.WeatherForecast;
 import com.bj.moeweather.gson.WeatherLifestyle;
 import com.bj.moeweather.gson.WeatherNow;
+import com.bj.moeweather.service.AutoUpdateService;
 import com.bj.moeweather.utils.HttpUtils;
 import com.bj.moeweather.utils.Utility;
 import com.bumptech.glide.Glide;
@@ -245,6 +247,10 @@ public class WeatherActivity extends AppCompatActivity {
             carWashText.setText(carWash);
             sportText.setText(sport);
             weatherLayout.setVisibility(View.VISIBLE);
+
+            //激活后台自动更新
+            Intent intent = new Intent(this, AutoUpdateService.class);
+            startService(intent);
         } else {
             Toast.makeText(WeatherActivity.this, "获取天气信息失败", Toast.LENGTH_SHORT).show();
         }
